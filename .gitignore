@@ -1,0 +1,17 @@
+__pycache__/
+*.pyc
+*.~undo-tree~
+.DS_Store
+
+opt/
+faropt/
+
+pic/
+records/
+savings/
+
+*.log
+*.seed
+
+Native.pdb
+out.pdb
