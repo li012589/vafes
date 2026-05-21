@@ -1,6 +1,6 @@
-# Variational Free Energy Surface
+# Variational Free Energy Surface (VaFES)
 
-PyTorch implementation for the paper _Differentiable free energy surface: a variational approach to directly observing rare events using generative deep-learning models_. The repository contains all necessary scripts needed to reproduce the paper experiments.
+PyTorch implementation for the paper _Differentiable free energy surface: a variational approach to directly observing rare events using generative deep-learning models_. The repository contains necessary scripts to reproduce the paper experiments.
 
 ## Overview
 
