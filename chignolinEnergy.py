@@ -21,48 +21,6 @@ _idxZ=73
 _Zamino = 9
 
 
-def readPDB(pdbFile):
-    r'''
-    Read data from pdb file
-    '''
-    with open(pdbFile, 'r') as f:
-        lines = f.readlines()
-
-    SMILES = []
-    position = []
-    protein = []
-    _counter = 0
-    for l in lines:
-        l = l.split()
-        if l[0] == 'ATOM':
-            idx, label, amino, noAmino, corX, corY, corZ, ele = int(l[1]), l[2], l[3], int(l[5]), float(l[6]), float(l[7]), float(l[8]), l[-1]
-            ele = ele[0]
-            SMILES.append(ele)
-            position.append([corX, corY, corZ])
-            if noAmino > _counter:
-                _counter = noAmino
-                protein.append({
-                    'type': amino,
-                    'main': [],
-                    'R': [],
-                })
-            if label == 'CA':
-                protein[noAmino-1]['CA'] = idx-1
-                protein[noAmino-1]['main'].append(idx-1)
-            elif label == 'N' or label == 'C':
-                protein[noAmino-1]['main'].append(idx-1)
-            elif label == 'O':
-                protein[noAmino-1]['main'].append(idx-1)
-            elif ele == 'H':
-                continue
-            else:
-                protein[noAmino-1]['R'].append(idx-1)
-
-    SMILES = ''.join(SMILES)
-    position = np.array(position).astype(float)
-    return SMILES, position, protein
-
-
 def _preprocess(config, Natom=_Natom, idxO=_idxO, idxY=_idxY, idxX=_idxX, idxZ=_idxZ):
     r'''
     Convert from a arbitrary coordinate system to the convention.
@@ -277,57 +235,6 @@ def addHydrogen(configs, refHeavy, refHydrogen, Hidx, heavyIdx, maskH, maskNCO):
     return newConfig
 
 
-def plotHisto(data_np):
-    import matplotlib.pyplot as plt
-    # Convert to a NumPy array.
-    #data_np = localTorsionAtom.reshape(batch, -1).detach().cpu().numpy()
-    #data_np = localResidue.reshape(batch, -1).detach().cpu().numpy()
-    #data_np = localPlaneAtom.reshape(batch, -1).detach().cpu().numpy()
-    #data_np = localBasis.reshape(batch, -1).detach().cpu().numpy()
-    #data_np = localResults.detach().cpu().numpy()
-
-    # ====== Configurable parameters ======
-    per_page = 24      # features per page (suggested 24-36)
-    rows, cols = 4, 6  # subplot layout (4 x 6 = 24)
-    figsize = (15, 10) # figure size (width, height)
-
-    # Compute the total number of pages.
-    total_features = data_np.shape[1]
-    num_pages = (total_features + per_page - 1) // per_page
-
-    for page in range(num_pages):
-        # Compute the feature range for this page.
-        start_idx = page * per_page
-        end_idx = min(start_idx + per_page, total_features)
-        current_features = data_np[:, start_idx:end_idx]
-
-        # Create subplots.
-        fig, axes = plt.subplots(rows, cols, figsize=figsize)
-        axes = axes.flatten()
-
-        # Plot histograms for the current page.
-        for i in range(current_features.shape[1]):
-            ax = axes[i]
-            # Plot a histogram with 30 bins.
-            ax.hist(current_features[:, i], bins=30,
-                    color='#1f77b4', edgecolor='black', alpha=0.8)
-            ax.set_title(f'Feature {start_idx + i}', fontsize=10)
-            ax.grid(True, linestyle='--', alpha=0.5)
-            # Hide axis labels to reduce clutter.
-            ax.set_xlabel('')
-            ax.set_ylabel('')
-
-        # Hide unused subplots on the last page.
-        for j in range(current_features.shape[1], rows * cols):
-            axes[j].axis('off')
-
-        # Add the page title and adjust the layout.
-        plt.suptitle(f'Features {start_idx}-{end_idx-1} (Page {page+1}/{num_pages})',
-                     fontsize=14, y=0.98)
-        plt.tight_layout(rect=[0, 0, 1, 0.95])  # leave room for the title
-    plt.show()
-
-
 class ProteinConciseExpression(flow.Bijector):
     r'''
     expression protein atom coordinates in a concise way.
@@ -400,7 +307,6 @@ def _full2concise(configs):
         localPlaneAtom.reshape(batch, -1)
     ], dim=-1)
 
-    #plotHisto(localResults.detach().cpu().numpy())
     return localResults, logDet
 
 
@@ -421,13 +327,9 @@ def _concise2full(conciseConfig):
 
     # rotations
     localBasis[:, basisRotation] = localBasis[:, basisRotation] - basisRotationCentering.to(configs)
-    #+ math.pi) % (2 * math.pi) - math.pi
     localTorsionAtom[:, torsionRotatePi, -1] = localTorsionAtom[:, torsionRotatePi, -1] - (math.pi)
-    #+ math.pi) % (2 * math.pi) - math.pi
     localTorsionAtom[:, :6, -1] = localTorsionAtom[:, :6, -1] - peptideTorsionCentering.to(configs)
-    #+ math.pi) % (2 * math.pi) - math.pi
     localResidue[:, residueRotation] = localResidue[:, residueRotation] - residueRotatioCentering.to(configs)
-    #+ math.pi) % (2 * math.pi) - math.pi
 
     # put togther localDisVec
     localDisVec = torch.zeros(batch, 2, 3).to(configs)
