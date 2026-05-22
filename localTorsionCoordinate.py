@@ -1,5 +1,5 @@
 import torch
-from torch.autograd.functional import jacobian
+
 
 def compute_torsion(pN, pA, pB, pX):
     ab = pA - pN

@@ -1,5 +1,5 @@
 import torch
-from torch.autograd.functional import jacobian
+
 
 def forwardCartesian(points):
     """
