@@ -155,10 +155,10 @@ python3 carmsd.py -load1 /path/to/1uao.pdb -load2 <protein-dir>/pic/Native.pdb -
 Scripts write outputs either into the directory passed with `-load` or into an automatically created training directory.
 
 Typical outputs:
-- dimer: `exactCVfreeE.npy`, `estCVfreeE.npy`, `cvFreeEcompare.pdf`
-- H2N2: `estCVfreeE.npy`, `NEBpath.npy`, `NEBpathNaive.npy`, `pic/*.pdf`
-- alanine dipeptide: `estCVfreeE.npy`, `NEBpath.npy`, `pathFEvalue.npy`, `pathDihedral.npy`, `configPath.xyz`, `path_configs/`
-- chignolin: `estCVfreeE.npy`, `samplesCV.npy`, `sampleEnergies.npy`, `pic/*.pdf`
+- dimer: `exactCVfreeE.npy`, `estCVfreeE.npy`, `cvFreeEcompare.pdf` (FIG. 2(a)), `TcvFreeEest.pdf` (FIG. 2(b)), `TcvFreeEexact.pdf` (FIG. S1)
+- H2N2: `estCVfreeE.npy`, `NEBpath.npy` (configs in FIG. 3(b)), `NEBpathNaive.npy` (configs in FIG. 3(c)), `pic/cvPath.pdf` (FIG. 3(a)), , `pic/fePath.pdf` (FIG. 3(b)), `pic/fePathNaive.pdf` (FIG. 3(c))
+- alanine dipeptide: `estCVfreeE.npy`, `NEBpath.npy`, `pathFEvalue.npy`, `pathDihedral.npy`, `configPath.xyz`, `path_configs/*.xyz` (configs in FIG. 4(a) and (b)), `pic/cvPath.pdf` (FIG. 4(c)), , `pic/fePath.pdf` (FIG. 4(d))
+- chignolin: `estCVfreeE.npy`, `samplesCV.npy`, `sampleEnergies.npy`, `pic/cvFreeEnergy.pdf` (FIG. 5(a)), `pic/*.pdb` (configs in FIG. 5(b))
 
 ## Bundled Assets and Datasets
 
