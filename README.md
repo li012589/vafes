@@ -4,18 +4,18 @@ PyTorch implementation for the paper _Differentiable free energy surface: a vari
 
 ## Overview
 
-Included applications:
-- dimer
-- H2N2
+Included application experiments:
+- bistable dimer
+- H2N2 (diazene)
 - alanine dipeptide
-- chignolin
+- chignolin (PDB: 1UAO)
 
 ## Requirements
 
 The code runs on standard CPUs and benefits from GPUs when available. 
-(scripts are tested on Apple Silicon, Intel CPUs, and NVIDIA GPUs)
+For hardware devices, the package has been tested on Apple M chips, Intel CPUs, and NVIDIA GPUs
 
-The package has been tested on:
+For software environments, the package has been tested on:
 - macOS (Tahoe 26.5) 
 - Linux (Ubuntu 22.04.5 LTS)
 
@@ -46,7 +46,7 @@ python3 -m pip install -r requirements.txt
 
 ## Application Experiments
 
-### Dimer
+### Bistable Dimer
 
 Train:
 
@@ -95,7 +95,7 @@ python3 h2n2Plot.py -load <h2n2-dir>
 Train:
 
 ```bash
-python3 dipeptideTrain.py -loadV <path-to-TICA-projection-npy>
+python3 dipeptideTrain.py -loadV /path/to/TICA_data.npz
 ```
 - `-loadV` defaultly uses `etc/dipeptideMeta.npz` for demonstration.
 - Expected run time: about 5 hours (on one Nvidia RTX4090, 24GB)
@@ -140,6 +140,7 @@ Optional structure extraction examples:
 ```bash
 python3 chignolinPlot.py -load <protein-dir> -region "Native:3.4:4.0:4.0:4.6" -outputPDB
 ```
+- `-region "Native:3.4:4.0:4.0:4.6"` marks a region (x from 3.4 to 4, y from 4 to 4.6) with label `Native` on the free energy surface plot, and output a minimum-energy configuration (`Native.pdb`) in that region.
 
 Compute CA-RMSD against an experimental/reference PDB after exporting `Native.pdb`:
 
@@ -163,9 +164,9 @@ Typical outputs:
 
 - `etc/h2n2cis.npy`: reference H2N2 cis conformations used to train the H2N2 CV model.
 - `etc/h2n2trans.npy`: reference H2N2 trans conformations used together with the cis set for H2N2 CV training.
-- `etc/dipeptideMeta.npz`: alanine dipeptide demonstration rotation matrix and coordinate ranges.
+- `etc/dipeptideMeta.npz`: demonstration example of alanine dipeptide projection matrix and coordinate ranges.
 - `etc/chignolinMeta.npz`: helper arrays for the chignolin local-coordinate parameterization, including ranges and hydrogen-placement metadata.
-- `etc/geoOpt.pdb`: reference chignolin structure used by the OpenMM frontend.
+- `etc/geoOpt.pdb`: reference chignolin template used by the OpenMM frontend.
 
 ## Citation
 
