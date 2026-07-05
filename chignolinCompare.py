@@ -83,7 +83,8 @@ if __name__ == '__main__':
     nvars = [223]
     prior = source.TruncatedGaussian
     transformationList = [flow.SplineFlow]
-    priorParam, muNet, sigmaNet, transformationParamList = torch.load(os.path.join(args.load, "best_TrainLoss_joint.saving"), map_location=device, weights_only=False)
+    _saved = torch.load(os.path.join(args.load, "best_TrainLoss_joint.saving"), map_location=device, weights_only=False)
+    priorParam, transformationParamList = _saved[0], _saved[-1]
 
     lossLst = []
     energyLst = []

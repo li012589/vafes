@@ -184,8 +184,6 @@ if __name__ == "__main__":
         _mu = (ranges[2:, 0] + ranges[2:, 1]) / 2
         _logsigma = torch.randn(N) / np.sqrt(N) + 1
         priorParam = prior.initalize({'low': ranges[2:, 0], 'high': ranges[2:, 1], 'mu': _mu, 'logsigma': _logsigma})
-        muNet = utils.layer.SimpleMLP([3 + extraInputDims, *mlpVector, N], (len(mlpVector)) * [nn.ELU()] + [nn.Sigmoid()])
-        sigmaNet = utils.layer.SimpleMLP([3 + extraInputDims, *mlpVector, N], (len(mlpVector)) * [nn.ELU()] + [nn.ELU()])
 
         maskList = []
         maskConpList = []
@@ -278,13 +276,12 @@ if __name__ == "__main__":
 
         transformationParamList = utils.put(transformationParamList, device)
         priorParam = utils.put(priorParam, device)
-        muNet = utils.put(muNet, device)
-        sigmaNet = utils.put(sigmaNet, device)
     else:
         nvars = [223]
         prior = source.TruncatedGaussian
         transformationList = [flow.SplineFlow]
-        priorParam, muNet, sigmaNet, transformationParamList = torch.load(os.path.join(args.retrain, "best_TrainLoss_joint.saving"), map_location=device, weights_only=False)
+        _saved = torch.load(os.path.join(args.retrain, "best_TrainLoss_joint.saving"), map_location=device, weights_only=False)
+        priorParam, transformationParamList = _saved[0], _saved[-1]
 
         lossLst = []
         energyLst = []
@@ -324,7 +321,7 @@ if __name__ == "__main__":
 
         if lossSum < bestTrainLoss:
             bestTrainLoss = lossSum.item()
-            torch.save([priorParam, muNet, sigmaNet, transformationParamList], os.path.join(rootFolder, 'best_TrainLoss_joint.saving'))
+            torch.save([priorParam, transformationParamList], os.path.join(rootFolder, 'best_TrainLoss_joint.saving'))
             print("--> Updated best model: ", bestTrainLoss)
 
         printString = "epoch: {:d}, L: {:.5f}, "
@@ -340,7 +337,7 @@ if __name__ == "__main__":
             resultLst += [lossLst[idx].item(), energyLst[idx].item(), energyMeanLst[idx].item()]
             print(printString.format(*resultLst))
 
-    paramsList = list(utils.yieldTrainable([muNet, sigmaNet, transformationParamList]))
+    paramsList = list(utils.yieldTrainable([transformationParamList]))
     paramsList = list(filter(lambda p: p.requires_grad, paramsList))
     nparams = sum([np.prod(p.size()) for p in paramsList])
     print('total nubmer of trainable parameters:', nparams)
@@ -459,8 +456,9 @@ if __name__ == "__main__":
         LOSS.append(lossSum)
 
         if noReg is not None and lossSum > bestTrainLoss * (1 - noReg):
-            priorParam, muNet, sigmaNet, transformationParamList = torch.load(os.path.join(rootFolder, 'best_TrainLoss_joint.saving'), map_location=device, weights_only=False)
-            paramsList = list(utils.yieldTrainable([muNet, sigmaNet, transformationParamList]))
+            _saved = torch.load(os.path.join(rootFolder, 'best_TrainLoss_joint.saving'), map_location=device, weights_only=False)
+            priorParam, transformationParamList = _saved[0], _saved[-1]
+            paramsList = list(utils.yieldTrainable([transformationParamList]))
             paramsList = list(filter(lambda p: p.requires_grad, paramsList))
             savedOpt = torch.load(os.path.join(rootFolder, 'best_Train_opt.saving'), map_location='cpu', weights_only=False)
             optimizer = torch.optim.Adamax(paramsList, lr=lr)
@@ -473,7 +471,7 @@ if __name__ == "__main__":
             print(f"--> Rolled back to best model due to performance regression: {lossSum:.5f} > {bestTrainLoss * (1 - noReg):.5f}")
         elif lossSum < bestTrainLoss:
             bestTrainLoss = lossSum.item()
-            torch.save([priorParam, muNet, sigmaNet, transformationParamList], os.path.join(rootFolder, 'best_TrainLoss_joint.saving'))
+            torch.save([priorParam, transformationParamList], os.path.join(rootFolder, 'best_TrainLoss_joint.saving'))
             torch.save(optimizer, os.path.join(rootFolder, 'best_Train_opt.saving'))
             print("--> Updated best model: ", bestTrainLoss)
 
@@ -493,7 +491,7 @@ if __name__ == "__main__":
         scheduler.step()
 
         if e % saveStep == 0 or e == 0:
-            torch.save([priorParam, muNet, sigmaNet, transformationParamList], os.path.join(rootFolder, 'savings', 'ALDPNF' + '_epoch_' + str(e) + ".saving"))
+            torch.save([priorParam, transformationParamList], os.path.join(rootFolder, 'savings', 'ALDPNF' + '_epoch_' + str(e) + ".saving"))
             with h5py.File(os.path.join(rootFolder, "records", "LOSS"+'.hdf5'), 'w') as f:
                 f.create_dataset("LOSS", data=np.array(LOSS))
             lossfig = plt.figure(figsize=(8, 5))
