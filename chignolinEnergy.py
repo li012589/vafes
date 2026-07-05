@@ -155,7 +155,7 @@ def _forwardDis(cartesian_coords: torch.Tensor):
     transformed_coords = torch.stack([r, a, b], dim=1)
 
     # log|det(J)| = -2 * log(r), depending only on r.
-    log_abs_det = -2 * torch.log(torch.clamp(r, min=1e-5))
+    log_abs_det = -2 * torch.log(r + 1e-5)
     log_abs_det = log_abs_det.unsqueeze(1)  # [batch] -> [batch, 1]
 
     return transformed_coords, log_abs_det
@@ -259,7 +259,7 @@ def _full2concise(configs):
     localDisVec, disLogDet = _forwardDis(disVec.reshape(-1, 3))
     localDisVec = localDisVec.reshape(batch, _allDisIdx.shape[0], 3)
     disLogDet = disLogDet.reshape(batch, _allDisIdx.shape[0])
-    disLogDet[:, 0] = disLogDet[:, 0] + torch.log(torch.clamp(localDisVec[:, 0, 0], min=1e-5))
+    disLogDet[:, 0] = disLogDet[:, 0] + torch.log(localDisVec[:, 0, 0] + 1e-5)
     disLogDet = disLogDet.sum(-1, keepdim=True)
     logDet = logDet + disLogDet
 
