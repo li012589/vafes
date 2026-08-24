@@ -132,7 +132,7 @@ python3 chignolinCompare.py -load <protein-dir>
 Make the plot:
 
 ```bash
-python3 chignolinPlot.py -load <protein-dir>
+python3 chignolinPlot.py -load <protein-dir> 
 ```
 
 Optional structure extraction examples:
@@ -158,7 +158,7 @@ Typical outputs:
 - dimer: `exactCVfreeE.npy`, `estCVfreeE.npy`, `cvFreeEcompare.pdf` (FIG. 2(a)), `TcvFreeEest.pdf` (FIG. 2(b)), `TcvFreeEexact.pdf` (FIG. S1)
 - H2N2: `estCVfreeE.npy`, `NEBpath.npy` (configs in FIG. 3(b)), `NEBpathNaive.npy` (configs in FIG. 3(c)), `pic/cvPath.pdf` (FIG. 3(a)), , `pic/fePath.pdf` (FIG. 3(b)), `pic/fePathNaive.pdf` (FIG. 3(c))
 - alanine dipeptide: `estCVfreeE.npy`, `NEBpath.npy`, `pathFEvalue.npy`, `pathDihedral.npy`, `configPath.xyz`, `path_configs/*.xyz` (configs in FIG. 4(a) and (b)), `pic/cvPath.pdf` (FIG. 4(c)), , `pic/fePath.pdf` (FIG. 4(d))
-- chignolin: `estCVfreeE.npy`, `samplesCV.npy`, `sampleEnergies.npy`, `pic/cvFreeEnergy.pdf` (FIG. 5(a)), `pic/*.pdb` (configs in FIG. 5(b))
+- chignolin: `estCVfreeE.npy`, `samplesCV.npy`, `sampleEnergies.npy`, `pic/cvFreeEnergy.pdf` (FIG. 6(a)), `pic/*.pdb` (configs in FIG. 6(b))
 
 ## Bundled Assets and Datasets
 
