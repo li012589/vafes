@@ -47,12 +47,12 @@ if __name__ == "__main__":
 
     group = parser.add_argument_group("model parameters")
     group.add_argument("-K", type=int, default=50, help="bin number of nsf flow")
-    group.add_argument("-layer", type=int, default=16, help="num of transformation layers")
-    group.add_argument("-mlpVector", default=[128, 256, 512, 1024], type=int, nargs="+", help="hidden dim of MLP used in spline flow")
+    group.add_argument("-layer", type=int, default=12, help="num of transformation layers")
+    group.add_argument("-mlpVector", default=[512, 512, 512, 1024, 1024], type=int, nargs="+", help="hidden dim of MLP used in spline flow")
 
     group = parser.add_argument_group("target parameters")
     parser.add_argument("-loadV", default=DEFAULT_LOADV, help="path to load V matrix from TICA")
-    group.add_argument("-T", type=float, default=1, help="temperature")
+    group.add_argument("-T", type=float, default=2.49, help="temperature")
 
     args = parser.parse_args()
 
