@@ -67,7 +67,6 @@ if __name__ == "__main__":
     group.add_argument("-betahigh", type=float, default=0.1, help="high temperature end point in training")
     group.add_argument("-betaPTlow", type=float, default=0.6, help="low temperature start point in training")
     group.add_argument("-betaPThigh", type=float, default=0.1, help="high temperature end point in training")
-    group.add_argument("-addMesh", type=int, default=None, help="create n-by-n mesh grid in cv12 space and combine with random samples")
     group.add_argument("-betaCV", action='store_true', help="use betaCV (beta + cv12) as conditioning, adds 2 dims to network input")
 
     args = parser.parse_args()
@@ -363,15 +362,7 @@ if __name__ == "__main__":
 
     def lr_lambda(epoch):
         return min(1.,1.) * np.power(lrdecay, epoch)
-    scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size = 1000, gamma = 0.8)
-
-    if addMesh is not None:
-        meshCv1 = torch.linspace(min1, max1, addMesh).to(device, dtype)
-        meshCv2 = torch.linspace(min2, max2, addMesh).to(device, dtype)
-        meshCv1, meshCv2 = torch.meshgrid(meshCv1, meshCv2, indexing='ij')
-        meshCv1 = meshCv1.reshape(-1, 1)
-        meshCv2 = meshCv2.reshape(-1, 1)
-        meshCv12 = torch.cat([meshCv1, meshCv2], dim=-1)
+    scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size = 1000, gamma=0.8)
 
     LOSS = []
     for e in range(epoch):
@@ -385,10 +376,6 @@ if __name__ == "__main__":
             cv1 = torch.rand(batch, 1).to(device, dtype) * (max1 - min1) + min1
             cv2 = torch.rand(batch, 1).to(device, dtype) * (max2 - min2) + min2
             cv12 = torch.cat([cv1, cv2], dim=-1)
-            if addMesh is not None:
-                cv12 = torch.cat([meshCv12, cv12], dim=0)
-                meshBeta = beta.repeat(addMesh * addMesh, 1)
-                beta_ = torch.cat([meshBeta, beta_], dim=0)
 
             if betaCV:
                 beta_input = torch.cat([beta_, cv12], dim=-1)
