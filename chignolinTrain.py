@@ -1,4 +1,5 @@
 import os
+import random
 
 from scope import source, flow, utils
 
@@ -25,9 +26,6 @@ def resolve_repo_path(path):
 
 
 if __name__ == "__main__":
-    rngseed = torch.seed()
-    torch.manual_seed(rngseed)
-    print("Using torch seed:", rngseed)
     parser = argparse.ArgumentParser(description="")
     parser.add_argument("-folder", default=None, help="path to save and load folder")
     parser.add_argument("-device", type=int, default=-1, help="device, -1 for cpu, 0-N for i-th GPU, -2 for mps")
@@ -35,6 +33,7 @@ if __name__ == "__main__":
     parser.add_argument("-retrain", default=None, help="path to save and load folder")
     parser.add_argument("-loadOpt", action='store_true', help="load optimizer state when retrain")
     parser.add_argument("-double", action='store_true', help="float64 or float32")
+    parser.add_argument("-seed", type=int, default=None, help="explicit random seed; omit to generate one")
 
     group = parser.add_argument_group("learning parameters")
     group.add_argument("-lr", type=float, default=2e-4, help="learning rate")
@@ -72,6 +71,17 @@ if __name__ == "__main__":
     group.add_argument("-betaCV", action='store_true', help="use betaCV (beta + cv12) as conditioning, adds 2 dims to network input")
 
     args = parser.parse_args()
+
+    if args.seed is None:
+        rngseed = int(torch.seed())
+    else:
+        rngseed = int(args.seed)
+    random.seed(rngseed)
+    np.random.seed(rngseed % (2**32))
+    torch.manual_seed(rngseed)
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed_all(rngseed)
+    print("Using random seed:", rngseed)
 
     if args.folder is None:
         rootFolder = "chignolinTrain_beta" + str(args.beta) + "_b" + str(args.K) + "_cp" + str(args.couplingLayer1) + '_' + str(args.couplingLayer2) + "_" + str(args.mlpVector) + "_ks" + str(args.kernelSize) + "_c" + str(args.channels) + '_' + str(args.hiddenChannels) + "_" + str(args.hiddenWidth) + '_n' + str(args.hiddenConvLayers) + '_' +str(args.hiddenFcLayers) + '_Tr' + str(args.betahigh) + '_' + str(args.betalow) + '_' + str(args.betaPThigh) + '_' + str(args.betaPTlow)
@@ -180,10 +190,7 @@ if __name__ == "__main__":
     if args.retrain is None:
         N = 223
         nvars = [N]
-        prior = source.TruncatedGaussian
-        _mu = (ranges[2:, 0] + ranges[2:, 1]) / 2
-        _logsigma = torch.randn(N) / np.sqrt(N) + 1
-        priorParam = prior.initalize({'low': ranges[2:, 0], 'high': ranges[2:, 1], 'mu': _mu, 'logsigma': _logsigma})
+        priorParam = source.Uniform.initalize({'low': ranges[2:, 0], 'high': ranges[2:, 1]})
 
         maskList = []
         maskConpList = []
@@ -278,7 +285,6 @@ if __name__ == "__main__":
         priorParam = utils.put(priorParam, device)
     else:
         nvars = [223]
-        prior = source.TruncatedGaussian
         transformationList = [flow.SplineFlow]
         _saved = torch.load(os.path.join(args.retrain, "best_TrainLoss_joint.saving"), map_location=device, weights_only=False)
         priorParam, transformationParamList = _saved[0], _saved[-1]
