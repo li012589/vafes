@@ -1,4 +1,5 @@
 import os
+import random
 
 from scope import source, flow, utils
 
@@ -24,14 +25,12 @@ def resolve_repo_path(path):
 
 
 if __name__ == "__main__":
-    rngseed = torch.seed()
-    torch.manual_seed(rngseed)
-    print("Using torch seed:", rngseed)
     parser = argparse.ArgumentParser(description="")
     parser.add_argument("-folder", default=None, help="path to save and load folder")
     parser.add_argument("-device", type=int, default=-1, help="device, -1 for cpu, 0-N for i-th GPU, -2 for mps")
     parser.add_argument("-load", action='store_true', help="if load or not")
     parser.add_argument("-double", action='store_true', help="float64 or float32")
+    parser.add_argument("-seed", type=int, default=None, help="explicit random seed; omit to generate one")
 
     group = parser.add_argument_group("learning parameters")
     group.add_argument("-lr", type=float, default=7e-4, help="learning rate")
@@ -55,6 +54,17 @@ if __name__ == "__main__":
     group.add_argument("-T", type=float, default=2.49, help="temperature")
 
     args = parser.parse_args()
+
+    if args.seed is None:
+        rngseed = int(torch.seed())
+    else:
+        rngseed = int(args.seed)
+    random.seed(rngseed)
+    np.random.seed(rngseed % (2**32))
+    torch.manual_seed(rngseed)
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed_all(rngseed)
+    print("Using random seed:", rngseed)
 
     if args.folder is None:
         rootFolder = "./opt/dipeptide_T" + str(args.T) + "_b" + str(args.K) + "_n" + str(args.layer) + "_" + str(args.mlpVector)
