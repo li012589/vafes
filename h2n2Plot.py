@@ -1,6 +1,7 @@
 import numpy as np
 
 import matplotlib.pyplot as plt
+from matplotlib.colors import LinearSegmentedColormap
 import argparse, os
 
 plt.rcParams.update({
@@ -11,7 +12,17 @@ plt.rcParams.update({
     "figure.dpi": 150
 })
 
-cmap = 'viridis'
+cmap = LinearSegmentedColormap.from_list(name="custom", colors = [(0, '#24496F'),
+                                                                  (0.1, '#2B7C85'),
+                                                                  (0.2, '#4DAB7E'),
+                                                                  (0.3, '#B6D550'),
+                                                                  (0.5, '#F3DD49'),
+                                                                  (0.6, '#F89951'),
+                                                                  (0.7, '#DC6941'),
+                                                                  (0.75, '#BA3D27'),
+                                                                  (0.9, '#E9C2BB'),
+                                                                  (1.0, 'white')
+                                                                  ])
 path_color1 = '#008060'
 path_color2 = '#FF6B35'
 

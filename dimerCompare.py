@@ -8,6 +8,7 @@ from scope import flow, source
 import torch
 import numpy as np
 from matplotlib import pyplot as plt
+from matplotlib.colors import LinearSegmentedColormap
 
 
 def add_subplot_axes(ax,rect,facecolor='w'):
@@ -162,7 +163,17 @@ if __name__ == "__main__":
         np.save(f, errsLst)
 
     _idx = [0, 49]
-    cmap = 'viridis'
+    cmap = LinearSegmentedColormap.from_list(name="custom", colors = [(0, '#24496F'),
+                                                                  (0.1, '#2B7C85'),
+                                                                  (0.2, '#4DAB7E'),
+                                                                  (0.3, '#B6D550'),
+                                                                  (0.5, '#F3DD49'),
+                                                                  (0.6, '#F89951'),
+                                                                  (0.7, '#DC6941'),
+                                                                  (0.75, '#BA3D27'),
+                                                                  (0.9, '#E9C2BB'),
+                                                                  (1.0, 'white')
+                                                                  ])
 
     coord1, coord2 = np.meshgrid(Rrange, Trange)
 
