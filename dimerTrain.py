@@ -1,4 +1,5 @@
 import os
+import random
 
 from scope import source, flow, utils
 from dimerExact import F as dimerF
@@ -84,14 +85,24 @@ class DimerBondLength(flow.Bijector):
 
 
 if __name__ == "__main__":
-    print(torch.seed())
-
     parser = argparse.ArgumentParser(description="Train the dimer free-energy model")
     parser.add_argument("-epoch", type=int, default=10000, help="number of training epochs")
     parser.add_argument("-epochSteps", type=int, default=35, help="optimization steps per epoch")
     parser.add_argument("-folder", default=None, help="path to save outputs")
     parser.add_argument("-device", type=int, default=-1, help="device, -1 for cpu, 0-N for i-th GPU, -2 for mps")
+    parser.add_argument("-seed", type=int, default=None, help="explicit random seed; omit to generate one")
     args = parser.parse_args()
+
+    if args.seed is None:
+        rngseed = int(torch.seed())
+    else:
+        rngseed = int(args.seed)
+    random.seed(rngseed)
+    np.random.seed(rngseed % (2**32))
+    torch.manual_seed(rngseed)
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed_all(rngseed)
+    print("Using random seed:", rngseed)
 
     T = torch.tensor(1.0)
     maxBond = 6
