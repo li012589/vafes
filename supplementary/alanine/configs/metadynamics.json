@@ -1,0 +1,9 @@
+{
+  "walkers": 16,
+  "steps_per_walker": 2000000000,
+  "dt_fs": 1.0,
+  "temperature_K": 300.0,
+  "friction_per_ps": 1.0,
+  "report_every": 5000,
+  "platform": "Reference"
+}
