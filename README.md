@@ -97,7 +97,7 @@ Train:
 ```bash
 python3 dipeptideTrain.py -loadV /path/to/TICA_data.npz
 ```
-- `-loadV` defaultly uses `etc/dipeptideMeta.npz` for demonstration.
+- `-loadV` defaultly uses `etc/dipeptideMeta.npz`.
 - Expected run time: about 5 hours (on one Nvidia RTX4090, 24GB)
 
 Evaluate the free energy surface:
@@ -164,7 +164,7 @@ Typical outputs:
 
 - `etc/h2n2cis.npy`: reference H2N2 cis conformations used to train the H2N2 CV model.
 - `etc/h2n2trans.npy`: reference H2N2 trans conformations used together with the cis set for H2N2 CV training.
-- `etc/dipeptideMeta.npz`: demonstration example of alanine dipeptide projection matrix and coordinate ranges.
+- `etc/dipeptideMeta.npz`: the full-rank projection matrix (a reduced TICA transformation) and coordinate ranges used for the alanine dipeptide application.
 - `etc/chignolinMeta.npz`: helper arrays for the chignolin local-coordinate parameterization, including ranges and hydrogen-placement metadata.
 - `etc/geoOpt.pdb`: reference chignolin template used by the OpenMM frontend.
 
